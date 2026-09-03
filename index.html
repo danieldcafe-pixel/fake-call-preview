@@ -61,13 +61,25 @@
     100%{ transform:scale(1.6); opacity:0; }
   }
   .invite-avatar{
+    position:relative;
     width:104px; height:104px; border-radius:50%;
     background:linear-gradient(145deg,var(--cyan),var(--violet));
+    background-size:cover; background-position:center;
     color:var(--ink);
     display:flex; align-items:center; justify-content:center;
     font-size:42px; font-weight:950;
     box-shadow:0 20px 50px rgba(0,0,0,.5), inset 0 0 24px rgba(255,255,255,.16);
+    cursor:pointer;
   }
+  .avatar-edit-badge{
+    position:absolute; right:-4px; bottom:-4px;
+    width:30px; height:30px; border-radius:50%;
+    background:rgba(0,0,0,.62);
+    border:2px solid rgba(255,255,255,.55);
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .avatar-edit-badge svg{ width:14px; height:14px; }
 
   .invite-name{ margin-top:18px; font-size:26px; font-weight:800; letter-spacing:.01em; }
   .invite-handle{ font-size:14px; color:var(--text-soft); opacity:.75; margin-top:2px; }
@@ -144,8 +156,14 @@
     <div class="invite-top">
       <div class="invite-eyebrow">Incoming Video Call</div>
       <div class="invite-avatar-wrap">
-        <div class="invite-avatar">H</div>
+        <div class="invite-avatar" id="inviteAvatar">
+          <span class="avatar-letter" id="avatarLetter">H</span>
+          <div class="avatar-edit-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </div>
+        </div>
       </div>
+      <input type="file" id="avatarFileInput" accept="image/*" hidden>
       <div class="invite-name">Helen Wildson</div>
       <div class="invite-handle">@helenwildson</div>
     </div>
@@ -196,6 +214,59 @@
   var chromaBg      = document.getElementById('chromaBg');
   var chromaColors  = ['#808080', '#00b140', '#0047ab', '#ffffff'];
   var chromaIndex   = 0;
+
+  var inviteAvatar   = document.getElementById('inviteAvatar');
+  var avatarLetter   = document.getElementById('avatarLetter');
+  var avatarFileInput = document.getElementById('avatarFileInput');
+  var AVATAR_KEY = 'fakecall_helen_avatar';
+
+  function applyAvatar(dataUrl){
+    if (dataUrl){
+      inviteAvatar.style.backgroundImage = 'url(' + dataUrl + ')';
+      avatarLetter.style.display = 'none';
+    } else {
+      inviteAvatar.style.backgroundImage = 'none';
+      avatarLetter.style.display = '';
+    }
+  }
+
+  try {
+    var savedAvatar = localStorage.getItem(AVATAR_KEY);
+    if (savedAvatar) applyAvatar(savedAvatar);
+  } catch(e){}
+
+  avatarFileInput.addEventListener('change', function(){
+    var file = avatarFileInput.files && avatarFileInput.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var dataUrl = reader.result;
+      try { localStorage.setItem(AVATAR_KEY, dataUrl); } catch(e){}
+      applyAvatar(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  var avatarPressTimer = null;
+  var avatarLongPressFired = false;
+  inviteAvatar.addEventListener('pointerdown', function(){
+    avatarLongPressFired = false;
+    avatarPressTimer = setTimeout(function(){
+      avatarLongPressFired = true;
+      try { localStorage.removeItem(AVATAR_KEY); } catch(e){}
+      applyAvatar(null);
+      if (navigator.vibrate) { try { navigator.vibrate(30); } catch(e){} }
+    }, 600);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){
+    inviteAvatar.addEventListener(ev, function(){
+      if (avatarPressTimer) { clearTimeout(avatarPressTimer); avatarPressTimer = null; }
+    });
+  });
+  inviteAvatar.addEventListener('click', function(){
+    if (avatarLongPressFired) { avatarLongPressFired = false; return; }
+    avatarFileInput.click();
+  });
 
   function setChroma(idx){
     chromaIndex = (idx + chromaColors.length) % chromaColors.length;
