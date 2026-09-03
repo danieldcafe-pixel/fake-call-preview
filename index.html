@@ -53,6 +53,7 @@
   .invite-avatar-wrap::before, .invite-avatar-wrap::after{
     content:""; position:absolute; inset:0; border-radius:50%;
     border:1px solid rgba(92,230,237,.35);
+    pointer-events:none;
   }
   .invite-avatar-wrap::before{ animation:ringExpand 1.7s var(--ease) infinite; }
   .invite-avatar-wrap::after{ animation:ringExpand 1.7s var(--ease) infinite .6s; }
