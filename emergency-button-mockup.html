@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Emergency Button — Option B</title>
+<style>
+  :root{
+    --alert:#ff4d4d;
+    --amber:#ffb020;
+    --orange:#ff8a2b;
+    --text-soft:#d9c7c3;
+    --line:rgba(255,255,255,.1);
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; width:100%; min-height:100%;
+    background:#000; color:#fff;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    -webkit-user-select:none; user-select:none;
+  }
+  #app{
+    min-height:100dvh;
+    background:
+      radial-gradient(90% 55% at 50% -10%, rgba(255,77,77,.18) 0%, transparent 55%),
+      radial-gradient(70% 50% at 90% 100%, rgba(255,176,32,.1) 0%, transparent 60%),
+      radial-gradient(120% 90% at 50% 100%, #150707 0%, #060202 55%, #000 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 40px 20px;
+    gap:34px;
+  }
+  .eyebrow{ font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--orange); font-weight:800; opacity:.9; }
+
+  .sos-wrap{
+    position:relative; width:220px; height:220px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .sos-ring{
+    position:absolute; inset:0; border-radius:50%;
+    border:1.5px solid rgba(255,77,77,.35);
+  }
+  .sos-ring.r2{ inset:18px; border-color:rgba(255,176,32,.25); }
+  .sos-ring.r3{ inset:36px; border-color:rgba(255,77,77,.2); }
+
+  .sos-btn{
+    position:relative; width:132px; height:132px; border-radius:50%;
+    background:
+      radial-gradient(60% 60% at 32% 26%, rgba(255,255,255,.4), transparent 60%),
+      linear-gradient(150deg,var(--alert),var(--amber));
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:2px;
+    color:#170202; cursor:pointer;
+    box-shadow:0 20px 50px rgba(255,60,40,.35), inset 0 0 24px rgba(255,255,255,.16);
+    transition:transform .1s var(--ease);
+  }
+  .sos-btn:active{ transform:scale(.95); }
+  .sos-label{ font-size:24px; font-weight:900; letter-spacing:.05em; }
+  .sos-sub{ font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; opacity:.75; }
+
+  .caption{ font-size:13px; color:var(--text-soft); opacity:.7; text-align:center; max-width:280px; line-height:1.5; }
+
+  .toast{
+    position:fixed; left:50%; bottom:34px; transform:translateX(-50%) translateY(20px);
+    background:rgba(20,6,6,.92); border:1px solid var(--alert);
+    padding:12px 20px; border-radius:8px; font-size:13px; font-weight:700;
+    letter-spacing:.03em; opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+    white-space:nowrap;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="eyebrow">Emergency</div>
+
+  <div class="sos-wrap">
+    <div class="sos-ring r1"></div>
+    <div class="sos-ring r2"></div>
+    <div class="sos-ring r3"></div>
+    <div class="sos-btn" id="sosBtn">
+      <span class="sos-label">SOS</span>
+      <span class="sos-sub">Emergency Call</span>
+    </div>
+  </div>
+
+  <div class="caption">Static — no animation, ready to sit on screen whether or not it's ever pressed.</div>
+</div>
+
+<div class="toast" id="toast">📞 Starting emergency call…</div>
+
+<script>
+(function(){
+  "use strict";
+  var toast = document.getElementById('toast');
+  document.getElementById('sosBtn').addEventListener('click', function(){
+    toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 1800);
+    if (navigator.vibrate) { try { navigator.vibrate(40); } catch(e){} }
+  });
+})();
+</script>
+</body>
+</html>
