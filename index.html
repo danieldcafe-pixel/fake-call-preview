@@ -149,12 +149,12 @@
       <div class="invite-eyebrow">Incoming Video Call</div>
       <div class="invite-avatar-wrap">
         <div class="invite-avatar" id="inviteAvatar">
-          <span class="avatar-letter" id="avatarLetter">H</span>
+          <span class="avatar-letter" id="avatarLetter">B</span>
         </div>
       </div>
       <input type="file" id="avatarFileInput" accept="image/*" hidden>
-      <div class="invite-name">Helen Wildson</div>
-      <div class="invite-handle">@helenwildson</div>
+      <div class="invite-name">BOE DEVERO</div>
+      <div class="invite-handle">@boedevero</div>
     </div>
 
     <div class="invite-question">DO YOU WANT TO JOIN<br>THE LIVE STREAM?</div>
@@ -207,7 +207,8 @@
   var inviteAvatar   = document.getElementById('inviteAvatar');
   var avatarLetter   = document.getElementById('avatarLetter');
   var avatarFileInput = document.getElementById('avatarFileInput');
-  var AVATAR_KEY = 'fakecall_helen_avatar';
+  var AVATAR_KEY = 'fakecall_boedevero_avatar';
+  var DEFAULT_AVATAR_URL = 'boedevero-avatar.jpg';
 
   function applyAvatar(dataUrl){
     if (dataUrl){
@@ -221,8 +222,10 @@
 
   try {
     var savedAvatar = localStorage.getItem(AVATAR_KEY);
-    if (savedAvatar) applyAvatar(savedAvatar);
-  } catch(e){}
+    applyAvatar(savedAvatar || DEFAULT_AVATAR_URL);
+  } catch(e){
+    applyAvatar(DEFAULT_AVATAR_URL);
+  }
 
   avatarFileInput.addEventListener('change', function(){
     var file = avatarFileInput.files && avatarFileInput.files[0];
@@ -243,7 +246,7 @@
     avatarPressTimer = setTimeout(function(){
       avatarLongPressFired = true;
       try { localStorage.removeItem(AVATAR_KEY); } catch(e){}
-      applyAvatar(null);
+      applyAvatar(DEFAULT_AVATAR_URL);
       if (navigator.vibrate) { try { navigator.vibrate(30); } catch(e){} }
     }, 600);
   });
